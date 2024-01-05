@@ -20,8 +20,8 @@ export default class NewBill {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    const fileExtension = fileName.split('.')[1]
-    console.log(fileExtension)
+    const fileNameElements = fileName.split('.')
+    const fileExtension = fileNameElements[fileNameElements.length-1]
     const authorizedExtensions = ["jpg","jpeg","png"]
 
     if(authorizedExtensions.includes(fileExtension)){
