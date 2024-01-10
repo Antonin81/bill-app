@@ -22,7 +22,22 @@ export const modal = () => (`
   `)
 
 export default (bill) => {
-
+  let fileZone = "";
+  if(bill.fileName!=="null"){
+    fileZone+=`
+              <div class="row">
+                <div class="col-sm">
+                  <label for="file" class="bold-label">Justificatif</label>
+                    <div class='input-field input-flex file-flex'>
+                    <span id="file-name-admin">${bill.fileName}</span>
+                    <div class='icons-container'>
+                      <span id="icon-eye-d" data-testid="icon-eye-d" data-bill-url="${bill.fileUrl}"> ${eyeWhite} </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              `
+  }
   return (`
     <div class="container dashboard-form" data-testid="dashboard-form">
       <div class="row">
@@ -64,17 +79,7 @@ export default (bill) => {
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-sm">
-          <label for="file" class="bold-label">Justificatif</label>
-            <div class='input-field input-flex file-flex'>
-            <span id="file-name-admin">${bill.fileName}</span>
-            <div class='icons-container'>
-              <span id="icon-eye-d" data-testid="icon-eye-d" data-bill-url="${bill.fileUrl}"> ${eyeWhite} </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      ${fileZone}
       <div class="row">
        ${bill.status === 'pending' ? (`
         <div class="col-sm">
