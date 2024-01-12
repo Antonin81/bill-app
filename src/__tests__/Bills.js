@@ -7,6 +7,7 @@ import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
+import Bills from "../containers/Bills.js";
 
 import router from "../app/Router.js";
 
@@ -26,6 +27,7 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
       //to-do write expect expression
+      expect(windowIcon.classList).toContain("active-icon")
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
@@ -34,6 +36,15 @@ describe("Given I am connected as an employee", () => {
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
+    })
+    test("When i click on an eye icon the modal opens", async ()=>{
+      document.body.innerHTML = BillsUI({ data: bills })
+      await waitFor(() => screen.getByTestId("modalFile"));
+      const modal = screen.getByTestId("modalFile");
+      await waitFor(() => screen.getByTestId("icon-eye"));
+      const firstEyeIcon = screen.getAllByTestId("icon-eye");
+      firstEyeIcon[0].click();
+      expect(modal.classList).toContain("show");
     })
   })
 })
