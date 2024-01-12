@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
+import {screen, waitFor, getAllByTestId, getByTestId, fireEvent} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
@@ -18,16 +18,15 @@ describe("Given I am connected as an employee", () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
-      }))
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      router()
-      window.onNavigate(ROUTES_PATH.Bills)
-      await waitFor(() => screen.getByTestId('icon-window'))
-      const windowIcon = screen.getByTestId('icon-window')
-      //to-do write expect expression
-      expect(windowIcon.classList).toContain("active-icon")
+      }));
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      window.onNavigate(ROUTES_PATH["Bills"]);
+      await waitFor(() => screen.getByTestId('icon-window'));
+      const windowIcon = screen.getByTestId('icon-window');
+      expect(windowIcon.classList).toContain("active-icon");
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
@@ -37,13 +36,13 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
-    test("When i click on an eye icon the modal opens", async ()=>{
+    test("Then when i click on an eye icon the modal opens", async ()=>{
       document.body.innerHTML = BillsUI({ data: bills })
       await waitFor(() => screen.getByTestId("modalFile"));
-      const modal = screen.getByTestId("modalFile");
-      await waitFor(() => screen.getByTestId("icon-eye"));
-      const firstEyeIcon = screen.getAllByTestId("icon-eye");
-      firstEyeIcon[0].click();
+      const modal = getByTestId(document.body, "modalFile");
+      await waitFor(() => screen.getAllByTestId("icon-eye")[0]);
+      const eyeIcons = getAllByTestId(document.body, "icon-eye");
+      fireEvent.click(eyeIcons[0]);
       expect(modal.classList).toContain("show");
     })
   })

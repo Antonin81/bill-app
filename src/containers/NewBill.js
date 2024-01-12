@@ -23,7 +23,6 @@ export default class NewBill {
     const fileNameElements = fileName.split('.')
     const fileExtension = fileNameElements[fileNameElements.length-1]
     const authorizedExtensions = ["jpg","jpeg","png"]
-
     if(authorizedExtensions.includes(fileExtension)){
       const formData = new FormData()
       const email = JSON.parse(localStorage.getItem("user")).email
@@ -45,14 +44,20 @@ export default class NewBill {
           this.fileName = fileName
         }).catch(error => console.error(error))
     } else {
-      this.document.querySelector(`input[data-testid="file"]`).value=""
-      alert("Le fichier doit être au format jpg, jpeg ou png")
+      const newInput = document.createElement('input');
+      newInput.type = 'file';
+      newInput.setAttribute('data-testid', 'file');
+      newInput.setAttribute('accept', 'image/png, image/jpeg, .png, .jpg, .jpeg');
+      newInput.setAttribute('class', 'form-control blue-border');
+      newInput.setAttribute('required', '""');
+      newInput.addEventListener('change', this.handleChangeFile);
+      this.document.querySelector(`input[data-testid="file"]`).parentNode.replaceChild(newInput, this.document.querySelector(`input[data-testid="file"]`));
+      // alert("Le fichier doit être au format jpg, jpeg ou png")
     }
     
   }
   handleSubmit = e => {
     e.preventDefault()
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,
