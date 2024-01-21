@@ -52,7 +52,7 @@ export default class NewBill {
       newInput.setAttribute('required', '""');
       newInput.addEventListener('change', this.handleChangeFile);
       this.document.querySelector(`input[data-testid="file"]`).parentNode.replaceChild(newInput, this.document.querySelector(`input[data-testid="file"]`));
-      // alert("Le fichier doit être au format jpg, jpeg ou png")
+      alert("Le fichier doit être au format jpg, jpeg ou png")
     }
     
   }

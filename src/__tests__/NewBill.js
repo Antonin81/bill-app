@@ -3,31 +3,34 @@
  */
 
 import { waitFor, screen, getByTestId, fireEvent } from "@testing-library/dom"
-import user from "@testing-library/user-event"
-import NewBill from "../containers/NewBill.js"
 import {localStorageMock} from "../__mocks__/localStorage.js";
-import { ROUTES_PATH} from "../constants/routes.js";
 import router from "../app/Router.js";
+import NewBill from "../containers/NewBill.js";
+import NewBillUI from "../views/NewBillUI.js";
+import { ROUTES_PATH } from "../constants/routes.js";
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
     beforeEach(()=>{
+      document.body.innerHTML="";
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
-      }))
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      router()
-      window.onNavigate(ROUTES_PATH.NewBill)
+      }));
+  
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      document.body.innerHTML = NewBillUI();
+      window.onNavigate(ROUTES_PATH["NewBill"]);
     })
-    test("Then new bill icon in vertical layout should be highlighted", async () => {      
+    test("Then new bill icon in vertical layout should be highlighted", async () => {     
       await waitFor(() => screen.getByTestId('icon-mail'))
       const mailIcon = getByTestId(document, 'icon-mail')
       expect(mailIcon.classList).toContain("active-icon")
     })
-
     test("Then bill icon in vertical layout should not be highlighted", async ()=>{
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = getByTestId(document, 'icon-window')
@@ -35,30 +38,49 @@ describe("Given I am connected as an employee", () => {
     })
 
     test("Then when i upload a good file, it is uploaded", async ()=>{
+      const store = null
+      const newBillPage = new NewBill({
+        document, onNavigate, store, localStorage: window.localStorage
+      })
+      const handleChangeFile = jest.fn(newBillPage.handleChangeFile);
       await waitFor(() => screen.getByTestId('file'))
       let fileInput = getByTestId(document.body, 'file');
+      fileInput.addEventListener("change",(e) => {handleChangeFile(e)})
       fireEvent.change(fileInput, {
         target: {
           files: [new File(['(⌐□_□)'], 'image.png', {type: 'image/png'})],
         },
       });
-      console.log(fileInput.files[0].name);
+      expect(handleChangeFile).toHaveBeenCalled();
       expect(fileInput.files.length).toEqual(1)
     })
 
     test("Then when i upload a wrong file, it is not uploaded", async ()=>{
+      const store = null
+      const newBillPage = new NewBill({
+        document, onNavigate, store, localStorage: window.localStorage
+      })
+      const handleChangeFile = jest.fn(newBillPage.handleChangeFile);
       await waitFor(() => screen.getByTestId('file'))
       let fileInput = getByTestId(document.body, 'file');
+      fileInput.addEventListener("change",(e) => {handleChangeFile(e)})
       fireEvent.change(fileInput, {
         target: {
           files: [new File(['(⌐□_□)'], 'image.json', {type: 'application/json'})],
         },
       });
-      console.log(fileInput.files[0].name);
-      expect(fileInput.files.length).toEqual(0)
+      expect(handleChangeFile).toHaveBeenCalled();
+      fileInput = getByTestId(document.body, 'file');
+      expect(fileInput.files.length).toEqual(0);
     })
-
+    
     test("Then when i complete and submit the form then it is sent", async ()=>{
+      const store = null
+      window.onNavigate = jest.fn();
+      const newBillPage = new NewBill({
+        document, onNavigate, store, localStorage: window.localStorage
+      })
+
       await waitFor(() => screen.getByTestId("form-new-bill"));
       await waitFor(() => screen.getByTestId("expense-type"));
       await waitFor(() => screen.getByTestId("expense-name"));
@@ -93,15 +115,22 @@ describe("Given I am connected as an employee", () => {
       expect(parseInt(pctInput.value)).toEqual(20);
       fireEvent.change(commentaryInput, {target: {value: "Pas de commentaires"}});
       expect(commentaryInput.value).toEqual("Pas de commentaires");
+
+      const handleChangeFile = jest.fn(newBillPage.handleChangeFile);
+      fileInput.addEventListener("change", (e) => {handleChangeFile(e)})
+
       fireEvent.change(fileInput, {
         target: {
           files: [new File(['(⌐□_□)'], 'image.png', {type: 'image/png'})],
         },
       });
-      expect(fileInput.files.length).toEqual(1);
       expect(fileInput.files[0].name).toEqual('image.png');
-      await fireEvent.submit(formInput);
-      expect(await screen.getByTestId('btn-new-bill')).toBeInTheDocument();
+
+      const handleSubmit = jest.fn(newBillPage.handleSubmit);
+      formInput.addEventListener("submit", (e) => {handleSubmit(e)})
+      fireEvent.submit(formInput);
+      expect(handleSubmit).toHaveBeenCalled();
+      expect(window.onNavigate).toHaveBeenCalledWith(ROUTES_PATH['Bills']);
     })
 
   })
