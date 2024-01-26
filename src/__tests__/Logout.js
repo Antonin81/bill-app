@@ -9,6 +9,7 @@ import { localStorageMock } from "../__mocks__/localStorage.js"
 import DashboardUI from "../views/DashboardUI.js"
 import userEvent from '@testing-library/user-event'
 import { ROUTES } from "../constants/routes"
+import BillsUI from "../views/BillsUI.js"
 
 const bills = [{
   "id": "47qAXb6fIm2zOKkLzMro",
@@ -41,6 +42,16 @@ describe('Given I am connected', () => {
       const handleClick = jest.fn(logout.handleClick)
 
       const disco = screen.getByTestId('layout-disconnect')
+      disco.addEventListener('click', handleClick)
+      userEvent.click(disco)
+      expect(handleClick).toHaveBeenCalled()
+      expect(screen.getByText('Administration')).toBeTruthy()
+
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      document.body.innerHTML = BillsUI({ data:bills })
+
       disco.addEventListener('click', handleClick)
       userEvent.click(disco)
       expect(handleClick).toHaveBeenCalled()
