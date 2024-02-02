@@ -22,7 +22,7 @@ export default class NewBill {
     const fileNameElements = fileName.split('.')
     const fileExtension = fileNameElements[fileNameElements.length-1]
     const authorizedExtensions = ["jpg","jpeg","png"]
-    if(authorizedExtensions.includes(fileExtension) && this.store!=undefined){
+    if(authorizedExtensions.includes(fileExtension) && this.store ){
       const formData = new FormData()
       const email = JSON.parse(localStorage.getItem("user")).email
       formData.append('file', file)
