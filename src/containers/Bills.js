@@ -35,11 +35,12 @@ export default class {
       .then(snapshot => {
         const bills = snapshot
           .sort((a, b) => {
-            if(a.date && !b.date){
-              return -1
+            console.log(a.date);
+            if(!b.date){
+              b.date = "1970-01-01"
             }
-            if(!a.date && b.date){
-              return 1
+            if(!a.date){
+              a.date = "1970-01-01"
             }
             return ((a.date < b.date) ? 1 : -1)
           })
